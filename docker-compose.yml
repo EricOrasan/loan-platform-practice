@@ -1,0 +1,140 @@
+name: loan-platform-practice
+
+services:
+  postgres:
+    image: postgres:18.4
+    container_name: loan-platform-postgres
+    restart: unless-stopped
+
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in the .env file}"
+      POSTGRES_DB: postgres
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./docker/postgres/init/01-create-databases.sql:/docker-entrypoint-initdb.d/01-create-databases.sql:ro
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U postgres -d postgres
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+    networks:
+      - loan-platform-network
+
+  kafka:
+    image: apache/kafka:4.3.1
+    container_name: loan-platform-kafka
+    hostname: kafka
+    restart: unless-stopped
+
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+
+    environment:
+      # KRaft single-node configuration
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: "broker,controller"
+
+      # Listener configuration
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_LISTENERS: "CONTROLLER://:29093,INTERNAL://:19092,EXTERNAL://:9092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:19092,EXTERNAL://localhost:${KAFKA_PORT:-9092}"
+
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:29093"
+
+      # Stable cluster identifier for local development
+      CLUSTER_ID: "4L6g3nShT-eMCtK--X86sw"
+
+      # Topics are created explicitly by kafka-init
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+
+      # Local single-broker defaults
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_MIN_INSYNC_REPLICAS: 1
+
+      # Kafka internal topics must also use replication factor 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_SHARE_COORDINATOR_STATE_TOPIC_MIN_ISR: 1
+
+      # Faster consumer-group initialization in local development
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:19092 --list >/dev/null 2>&1 || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 60s
+
+    networks:
+      - loan-platform-network
+
+  kafka-init:
+    image: apache/kafka:4.3.1
+    container_name: loan-platform-kafka-init
+    restart: "no"
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+    environment:
+      KAFKA_BOOTSTRAP_SERVER: kafka:19092
+
+    volumes:
+      - ./docker/kafka/init/01-create-topics.sh:/scripts/01-create-topics.sh:ro
+
+    entrypoint:
+      - /bin/bash
+      - /scripts/01-create-topics.sh
+
+    networks:
+      - loan-platform-network
+
+  kafka-ui:
+    image: ghcr.io/kafbat/kafka-ui:v1.5.0
+    container_name: loan-platform-kafka-ui
+    restart: unless-stopped
+
+    ports:
+      - "${KAFKA_UI_PORT:-8090}:8080"
+
+    environment:
+      KAFKA_CLUSTERS_0_NAME: loan-platform-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:19092
+      DYNAMIC_CONFIG_ENABLED: "false"
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+
+    networks:
+      - loan-platform-network
+
+volumes:
+  postgres_data:
+    name: loan-platform-postgres-data
+
+networks:
+  loan-platform-network:
+    name: loan-platform-network
+    driver: bridge
