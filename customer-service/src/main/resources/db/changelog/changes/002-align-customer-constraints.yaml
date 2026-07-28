@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-align-customer-constraints
+      author: eric
+
+      changes:
+        - modifyDataType:
+            tableName: customers
+            columnName: cif
+            newDataType: VARCHAR(8)
+
+        - sql:
+            dbms: postgresql
+            sql: |
+              ALTER TABLE customers
+                  ADD CONSTRAINT ck_customers_cif_format
+                  CHECK (cif ~ '^[0-9]{8}$');
+
+              ALTER TABLE customers
+                  ADD CONSTRAINT ck_customers_monthly_income_positive
+                  CHECK (monthly_income > 0);
+
+              ALTER TABLE customers
+                  ADD CONSTRAINT ck_customers_risk_category
+                  CHECK (risk_category IN ('LOW', 'MEDIUM', 'HIGH'));
+
+      rollback:
+        - sql:
+            dbms: postgresql
+            sql: |
+              ALTER TABLE customers
+                  DROP CONSTRAINT ck_customers_risk_category;
+
+              ALTER TABLE customers
+                  DROP CONSTRAINT ck_customers_monthly_income_positive;
+
+              ALTER TABLE customers
+                  DROP CONSTRAINT ck_customers_cif_format;
+
+        - modifyDataType:
+            tableName: customers
+            columnName: cif
+            newDataType: VARCHAR(20)

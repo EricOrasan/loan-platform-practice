@@ -2,7 +2,7 @@ package com.btproject.loanplatform.customer_service.mapper;
 
 import com.btproject.loanplatform.customer_service.dto.CreateCustomerRequest;
 import com.btproject.loanplatform.customer_service.dto.CustomerResponse;
-import com.btproject.loanplatform.customer_service.entity.Customer;
+import com.btproject.loanplatform.customer_service.domain.Customer;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

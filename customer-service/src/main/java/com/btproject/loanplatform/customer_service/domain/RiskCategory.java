@@ -1,4 +1,4 @@
-package com.btproject.loanplatform.customer_service.entity;
+package com.btproject.loanplatform.customer_service.domain;
 
 public enum RiskCategory {
     LOW,

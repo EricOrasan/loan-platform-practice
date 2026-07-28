@@ -1,4 +1,4 @@
-package com.btproject.loanplatform.customer_service.entity;
+package com.btproject.loanplatform.customer_service.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, length = 20, unique = true)
+    @Column(nullable = false, length = 8, unique = true)
     private String cif;
 
     @Column(name = "first_name", nullable = false, length = 100)
@@ -48,8 +48,9 @@ public class Customer {
 
     @PrePersist
     private void onCreate() {
-        createdAt = Instant.now();
-        updatedAt = Instant.now();
+        Instant now = Instant.now();
+        createdAt = now;
+        updatedAt = now;
     }
 
     @PreUpdate

@@ -1,6 +1,7 @@
 package com.btproject.loanplatform.customer_service.dto;
 
-import com.btproject.loanplatform.customer_service.entity.RiskCategory;
+import com.btproject.loanplatform.customer_service.domain.Cif;
+import com.btproject.loanplatform.customer_service.domain.RiskCategory;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -8,7 +9,10 @@ import java.math.BigDecimal;
 public record CreateCustomerRequest(
 
         @NotBlank(message = "CIF is required")
-        @Size(max = 20, message = "CIF must be at most 20 characters")
+        @Pattern(
+                regexp = Cif.FORMAT_REGEX,
+                message = Cif.VALIDATION_MESSAGE
+        )
         String cif,
 
         @NotBlank(message = "First Name is required")
@@ -24,8 +28,13 @@ public record CreateCustomerRequest(
         @Size(max = 255, message = "Email must have at most 255 characters")
         String email,
 
-        @NotNull(message = "Monthly Income is required")
-        @Positive(message = "Monthly Income must be greater than zero")
+        @NotNull(message = "Monthly income is required")
+        @Positive(message = "Monthly income must be greater than zero")
+        @Digits(
+                integer = 13,
+                fraction = 2,
+                message = "Monthly income must have at most 13 integer digits and 2 decimal places"
+        )
         BigDecimal monthlyIncome,
 
         @NotNull(message = "Risk Category is required")

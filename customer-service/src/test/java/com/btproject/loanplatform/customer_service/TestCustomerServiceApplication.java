@@ -1,11 +1,20 @@
 package com.btproject.loanplatform.customer_service;
 
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Bean;
+import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
-public class TestCustomerServiceApplication {
+@TestConfiguration(proxyBeanMethods = false)
+class TestcontainersConfiguration {
 
-	public static void main(String[] args) {
-		SpringApplication.from(CustomerServiceApplication::main).with(TestcontainersConfiguration.class).run(args);
-	}
+    private static final DockerImageName POSTGRES_IMAGE =
+            DockerImageName.parse("postgres:18.4");
 
+    @Bean
+    @ServiceConnection
+    PostgreSQLContainer postgresContainer() {
+        return new PostgreSQLContainer(POSTGRES_IMAGE);
+    }
 }
