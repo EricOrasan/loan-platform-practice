@@ -1,6 +1,5 @@
 package com.btproject.loanplatform.customer_service.dto;
 
-import com.btproject.loanplatform.customer_service.domain.Cif;
 import com.btproject.loanplatform.customer_service.domain.RiskCategory;
 import jakarta.validation.constraints.*;
 
@@ -10,8 +9,8 @@ public record CreateCustomerRequest(
 
         @NotBlank(message = "CIF is required")
         @Pattern(
-                regexp = Cif.FORMAT_REGEX,
-                message = Cif.VALIDATION_MESSAGE
+                regexp = "^[0-9]{8}$",
+                message = "CIF must contain exactly 8 digits"
         )
         String cif,
 

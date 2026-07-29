@@ -29,10 +29,7 @@ public class RestSecurityErrorHandler
     }
 
     @Override
-    public void commence(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            AuthenticationException exception
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception
     ) throws IOException {
         response.setHeader(
                 HttpHeaders.WWW_AUTHENTICATE,
@@ -49,10 +46,7 @@ public class RestSecurityErrorHandler
     }
 
     @Override
-    public void handle(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            AccessDeniedException exception
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception
     ) throws IOException {
         writeErrorResponse(
                 response,
@@ -63,13 +57,7 @@ public class RestSecurityErrorHandler
         );
     }
 
-    private void writeErrorResponse(
-            HttpServletResponse response,
-            HttpStatus status,
-            String code,
-            String message,
-            String details
-    ) throws IOException {
+    private void writeErrorResponse(HttpServletResponse response, HttpStatus status, String code, String message, String details) throws IOException {
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

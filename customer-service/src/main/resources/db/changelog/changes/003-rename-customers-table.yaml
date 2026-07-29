@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-rename-customers-table
+      author: eric
+
+      changes:
+        - renameTable:
+            oldTableName: customers
+            newTableName: customer
+
+        - sql:
+            dbms: postgresql
+            sql: |
+              ALTER TABLE customer
+                  RENAME CONSTRAINT pk_customers TO pk_customer;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT uk_customers_cif TO uk_customer_cif;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT uk_customers_email TO uk_customer_email;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT ck_customers_cif_format TO ck_customer_cif_format;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT ck_customers_monthly_income_positive TO ck_customer_monthly_income_positive;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT ck_customers_risk_category TO ck_customer_risk_category;
+
+      rollback:
+        - sql:
+            dbms: postgresql
+            sql: |
+              ALTER TABLE customer
+                  RENAME CONSTRAINT pk_customer TO pk_customers;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT uk_customer_cif TO uk_customers_cif;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT uk_customer_email TO uk_customers_email;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT ck_customer_cif_format TO ck_customers_cif_format;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT ck_customer_monthly_income_positive TO ck_customers_monthly_income_positive;
+
+              ALTER TABLE customer
+                  RENAME CONSTRAINT ck_customer_risk_category TO ck_customers_risk_category;
+
+        - renameTable:
+            oldTableName: customer
+            newTableName: customers

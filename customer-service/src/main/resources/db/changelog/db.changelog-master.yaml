@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/changes/001-create-customers-table.yaml
   - include:
       file: db/changelog/changes/002-align-customer-constraints.yaml
+  - include:
+      file: db/changelog/changes/003-rename-customers-table.yaml

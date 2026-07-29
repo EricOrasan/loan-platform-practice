@@ -1,6 +1,5 @@
 package com.btproject.loanplatform.customer_service.controller;
 
-import com.btproject.loanplatform.customer_service.domain.Cif;
 import com.btproject.loanplatform.customer_service.dto.CreateCustomerRequest;
 import com.btproject.loanplatform.customer_service.dto.CustomerResponse;
 import com.btproject.loanplatform.customer_service.service.CustomerService;
@@ -30,8 +29,8 @@ public class CustomerController {
     public CustomerResponse getCustomer(
             @PathVariable
             @Pattern(
-                    regexp = Cif.FORMAT_REGEX,
-                    message = Cif.VALIDATION_MESSAGE
+                    regexp = "^[0-9]{8}$",
+                    message = "CIF must contain exactly 8 digits"
             )
             String cif
     ) {
@@ -43,8 +42,8 @@ public class CustomerController {
     public void deleteCustomer(
             @PathVariable
             @Pattern(
-                    regexp = Cif.FORMAT_REGEX,
-                    message = Cif.VALIDATION_MESSAGE
+                    regexp = "^[0-9]{8}$",
+                    message = "CIF must contain exactly 8 digits"
             )
             String cif
     ) {

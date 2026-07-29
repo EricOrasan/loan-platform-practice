@@ -1,6 +1,7 @@
 package com.btproject.loanplatform.customer_service.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,11 +15,12 @@ import java.util.UUID;
 @Setter
 
 @Entity
-@Table(name = "customers")
+@Table(name = "customer")
 public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @Column(nullable = false, length = 8, unique = true)
@@ -41,9 +43,11 @@ public class Customer {
     private RiskCategory riskCategory;
 
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
     private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
+    @Setter(AccessLevel.NONE)
     private Instant updatedAt;
 
     @PrePersist

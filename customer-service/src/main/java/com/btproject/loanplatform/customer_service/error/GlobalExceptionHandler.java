@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.http.HttpStatus;
@@ -12,10 +13,12 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -27,13 +30,16 @@ public class GlobalExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    // TODO Replace randomUUID with correlationId
+
+    // 404 Customer Not Found
     @ExceptionHandler(CustomerNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleCustomerNotFound(CustomerNotFoundException exception) {
         ApiErrorResponse response = new ApiErrorResponse(
                 "CUSTOMER_NOT_FOUND",
                 "Customer was not found",
                 exception.getMessage(),
-                UUID.randomUUID(),        // TODO Replace with the request correlation ID.
+                UUID.randomUUID(),
                 Instant.now()
         );
 
@@ -42,7 +48,7 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    /// controller level CIF exception
+    // 400 Handles method parameter validation errors.
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ApiErrorResponse> handleMethodValidation(HandlerMethodValidationException exception) {
         String details = exception.getParameterValidationResults().stream()
@@ -60,7 +66,7 @@ public class GlobalExceptionHandler {
                 "VALIDATION_ERROR",
                 "Request validation failed",
                 details,
-                UUID.randomUUID(),    // TODO Replace with the request correlation ID.
+                UUID.randomUUID(),
                 Instant.now()
         );
 
@@ -69,39 +75,7 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-
-    /// service level CIF exception
-    @ExceptionHandler(InvalidCifException.class)
-    public ResponseEntity<ApiErrorResponse> handleInvalidCif(InvalidCifException exception) {
-        ApiErrorResponse response = new ApiErrorResponse(
-                "INVALID_CIF",
-                "Invalid CIF format",
-                exception.getMessage(),
-                UUID.randomUUID(),    // TODO Replace with the request correlation ID.
-                Instant.now()
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
-    }
-
-    @ExceptionHandler(CustomerAlreadyExistsException.class)
-    public ResponseEntity<ApiErrorResponse> handleCustomerAlreadyExists(CustomerAlreadyExistsException exception) {
-        ApiErrorResponse response = new ApiErrorResponse(
-                "CUSTOMER_ALREADY_EXISTS",
-                "Customer already exists",
-                exception.getMessage(),
-                UUID.randomUUID(),  // TODO Replace with the request correlation ID.
-                Instant.now()
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(response);
-    }
-
-    /// Request Body Validation
+    // 400 Handles request body validation errors.
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleRequestBodyValidation(MethodArgumentNotValidException exception) {
         String details = exception.getBindingResult()
@@ -140,7 +114,7 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    /// Invalid Request Body
+    // 400 Request body is missing, malformed, or contains an invalid value
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleUnreadableRequestBody(HttpMessageNotReadableException exception) {
         ApiErrorResponse response = new ApiErrorResponse(
@@ -156,6 +130,41 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    // 409 Customer Already exists
+    @ExceptionHandler(CustomerAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleCustomerAlreadyExists(CustomerAlreadyExistsException exception) {
+        ApiErrorResponse response = new ApiErrorResponse(
+                "CUSTOMER_ALREADY_EXISTS",
+                "Customer already exists",
+                exception.getMessage(),
+                UUID.randomUUID(),
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(response);
+    }
+
+    // 409 Handles database constraint violations caused by duplicate customer data.
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException exception) {
+        LOGGER.warn("Customer creation failed because of a database constraint");
+
+        ApiErrorResponse response = new ApiErrorResponse(
+                "CUSTOMER_ALREADY_EXISTS",
+                "Customer already exists",
+                "A customer with the provided CIF or email already exists.",
+                UUID.randomUUID(),
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(response);
+    }
+
+    // 415 Unsupported Media Type
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ApiErrorResponse> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException exception) {
         ApiErrorResponse response = new ApiErrorResponse(
@@ -171,6 +180,8 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+
+    // 503 Database Unavailable
     @ExceptionHandler({
             CannotCreateTransactionException.class,
             DataAccessResourceFailureException.class,
@@ -190,6 +201,38 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(response);
+    }
+
+    // 405 Method Not Allowed (PUT, PATCH, etc.)
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiErrorResponse> handleMethodNotAllowed(HttpRequestMethodNotSupportedException exception) {
+        ApiErrorResponse response = new ApiErrorResponse(
+                "METHOD_NOT_ALLOWED",
+                "Method not allowed",
+                "The requested HTTP method is not supported for this endpoint.",
+                UUID.randomUUID(),
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(response);
+    }
+
+    // 404 Bad Request URL
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleResourceNotFound(NoResourceFoundException exception) {
+        ApiErrorResponse response = new ApiErrorResponse(
+                "RESOURCE_NOT_FOUND",
+                "Resource was not found",
+                "The requested endpoint does not exist.",
+                UUID.randomUUID(),
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
                 .body(response);
     }
 

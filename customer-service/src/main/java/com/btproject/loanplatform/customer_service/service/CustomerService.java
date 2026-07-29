@@ -1,6 +1,5 @@
 package com.btproject.loanplatform.customer_service.service;
 
-import com.btproject.loanplatform.customer_service.domain.Cif;
 import com.btproject.loanplatform.customer_service.domain.Customer;
 import com.btproject.loanplatform.customer_service.dto.CreateCustomerRequest;
 import com.btproject.loanplatform.customer_service.dto.CustomerResponse;
@@ -26,9 +25,8 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public CustomerResponse getCustomerByCif(String cif) {
-        Cif customerCif = Cif.of(cif);
-        Customer customer = customerRepository.findByCif(customerCif.value())
-                .orElseThrow(() -> new CustomerNotFoundException(customerCif.value()));
+        Customer customer = customerRepository.findByCif(cif)
+                .orElseThrow(() -> new CustomerNotFoundException(cif));
         return customerMapper.toResponse(customer);
     }
 
@@ -39,7 +37,6 @@ public class CustomerService {
         }
 
         String normalizedEmail = request.email().strip().toLowerCase(Locale.ROOT);
-
         if (customerRepository.existsByEmail(normalizedEmail)) {
             throw CustomerAlreadyExistsException.forEmail();
         }
@@ -53,9 +50,8 @@ public class CustomerService {
 
     @Transactional
     public void deleteCustomerByCif(String cif) {
-        Cif customerCif = Cif.of(cif);
-        Customer customer = customerRepository.findByCif(customerCif.value())
-                .orElseThrow(() -> new CustomerNotFoundException(customerCif.value()));
+        Customer customer = customerRepository.findByCif(cif)
+                .orElseThrow(() -> new CustomerNotFoundException(cif));
         customerRepository.delete(customer);
     }
 }
