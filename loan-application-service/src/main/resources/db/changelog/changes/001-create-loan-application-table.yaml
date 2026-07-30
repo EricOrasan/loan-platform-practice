@@ -1,0 +1,111 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-loan-application-table
+      author: eric
+
+      changes:
+        - createTable:
+            tableName: loan_application
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_loan_application
+
+              - column:
+                  name: application_number
+                  type: VARCHAR(39)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: cif
+                  type: VARCHAR(8)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: requested_amount
+                  type: NUMERIC(15,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: requested_period_months
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: purpose
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: loan_application
+            columnNames: application_number
+            constraintName: uk_loan_application_application_number
+
+        - sql:
+            dbms: postgresql
+            splitStatements: true
+            sql: |
+              ALTER TABLE loan_application
+                  ADD CONSTRAINT ck_loan_application_amount
+                  CHECK (requested_amount > 0);
+
+              ALTER TABLE loan_application
+                  ADD CONSTRAINT ck_loan_application_period
+                  CHECK (requested_period_months BETWEEN 6 AND 120);
+
+              ALTER TABLE loan_application
+                  ADD CONSTRAINT ck_loan_application_cif
+                  CHECK (cif ~ '^[0-9]{8}$');
+
+              ALTER TABLE loan_application
+                  ADD CONSTRAINT ck_loan_application_purpose
+                  CHECK (length(trim(purpose)) > 0);
+
+              ALTER TABLE loan_application
+                  ADD CONSTRAINT ck_loan_application_status
+                  CHECK (
+                      status IN (
+                          'DRAFT',
+                          'SUBMITTED',
+                          'ASSESSMENT_IN_PROGRESS',
+                          'APPROVED',
+                          'REJECTED',
+                          'OFFER_GENERATED',
+                          'DELETED'
+                      )
+                  );
+
+              ALTER TABLE loan_application
+                  ADD CONSTRAINT ck_loan_application_timestamps
+                  CHECK (updated_at >= created_at);
+
+      rollback:
+        - dropTable:
+            tableName: loan_application
