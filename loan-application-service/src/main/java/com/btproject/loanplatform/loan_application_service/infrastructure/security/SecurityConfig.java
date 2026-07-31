@@ -1,5 +1,6 @@
 package com.btproject.loanplatform.loan_application_service.infrastructure.security;
 
+import com.btproject.loanplatform.loan_application_service.infrastructure.web.error.RestSecurityErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

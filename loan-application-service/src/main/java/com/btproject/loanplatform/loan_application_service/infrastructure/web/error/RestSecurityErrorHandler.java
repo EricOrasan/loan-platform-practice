@@ -1,6 +1,5 @@
-package com.btproject.loanplatform.loan_application_service.infrastructure.security;
+package com.btproject.loanplatform.loan_application_service.infrastructure.web.error;
 
-import com.btproject.loanplatform.loan_application_service.infrastructure.web.error.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;

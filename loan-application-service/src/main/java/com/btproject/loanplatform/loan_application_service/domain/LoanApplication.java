@@ -62,9 +62,13 @@ public final class LoanApplication {
             throw new InvalidLoanApplicationStatusException(this.status, "update");
         }
 
-        this.requestedAmount = verifyRequestedAmount(requestedAmount);
-        this.requestedPeriodMonths = verifyRequestedPeriodMonths(requestedPeriodMonths);
-        this.purpose = verifyPurpose(purpose);
+        BigDecimal validatedAmount = verifyRequestedAmount(requestedAmount);
+        int validatedPeriod = verifyRequestedPeriodMonths(requestedPeriodMonths);
+        String validatedPurpose = verifyPurpose(purpose);
+
+        this.requestedAmount = validatedAmount;
+        this.requestedPeriodMonths = validatedPeriod;
+        this.purpose = validatedPurpose;
         this.updatedAt = Instant.now();
     }
 
