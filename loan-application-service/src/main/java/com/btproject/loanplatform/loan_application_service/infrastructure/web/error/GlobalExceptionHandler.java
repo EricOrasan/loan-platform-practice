@@ -1,5 +1,6 @@
 package com.btproject.loanplatform.loan_application_service.infrastructure.web.error;
 
+import com.btproject.loanplatform.loan_application_service.application.exception.EventPublishingUnavailableException;
 import com.btproject.loanplatform.loan_application_service.application.exception.LoanApplicationNotFoundException;
 import com.btproject.loanplatform.loan_application_service.domain.exception.InvalidLoanApplicationStatusException;
 import org.slf4j.Logger;
@@ -231,6 +232,30 @@ public class GlobalExceptionHandler {
                 "Service temporarily unavailable",
                 "The database is temporarily unavailable. Please try again later.",
                 UUID.randomUUID(),
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(response);
+    }
+
+    // 503 Kafka Unavailable
+    @ExceptionHandler(EventPublishingUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> handleEventPublishingUnavailable(EventPublishingUnavailableException exception) {
+        UUID correlationId = UUID.randomUUID();
+
+        LOGGER.error(
+                "Kafka is temporarily unavailable. correlationId={}",
+                correlationId,
+                exception
+        );
+
+        ApiErrorResponse response = new ApiErrorResponse(
+                "EVENT_PUBLISHING_UNAVAILABLE",
+                "Service temporarily unavailable",
+                "Kafka is temporarily unavailable. Please try again later.",
+                correlationId,
                 Instant.now()
         );
 
