@@ -11,7 +11,7 @@
 *.iml
 *.ipr
 *.iws
-out/
+/out/
 
 # Logs
 *.log
@@ -23,6 +23,7 @@ Thumbs.db
 desktop.ini
 
 # Temporary files
+/tmp/
 *.tmp
 *.temp
 *.swp

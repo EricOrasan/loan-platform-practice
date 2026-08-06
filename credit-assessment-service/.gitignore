@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Keep hexagonal architecture output ports tracked.
+!src/main/java/**/application/port/out/
+!src/main/java/**/application/port/out/**
