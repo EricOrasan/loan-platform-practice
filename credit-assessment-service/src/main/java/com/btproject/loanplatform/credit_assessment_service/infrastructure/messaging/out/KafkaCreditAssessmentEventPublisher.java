@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
@@ -24,13 +25,15 @@ public class KafkaCreditAssessmentEventPublisher implements CreditAssessmentEven
     }
 
     @Override
-    public void publishCompleted(CreditAssessment assessment) {
+    public void publishCompleted(CreditAssessment assessment, BigDecimal requestedAmount, int requestedPeriodMonths) {
         LoanAssessmentCompletedEvent event =
                 new LoanAssessmentCompletedEvent(
                         UUID.randomUUID(),
                         "LOAN_ASSESSMENT_COMPLETED",
                         assessment.getApplicationId(),
                         assessment.getCif(),
+                        requestedAmount,
+                        requestedPeriodMonths,
                         assessment.getScore(),
                         assessment.getDecision(),
                         assessment.getReason(),

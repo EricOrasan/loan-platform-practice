@@ -50,6 +50,6 @@ public class ProcessLoanApplicationService implements ProcessLoanApplicationUseC
         }
 
         CreditAssessment savedAssessment = repository.save(assessment);
-        eventPublisher.publishCompleted(savedAssessment);
+        eventPublisher.publishCompleted(savedAssessment, command.requestedAmount(), command.requestedPeriodMonths());
     }
 }
