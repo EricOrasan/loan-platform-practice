@@ -1,4 +1,4 @@
-package com.btproject.loanplatform.offer_service.infrastructure.messaging.out;
+package com.btproject.loanplatform.notification_service.infrastructure.messaging.in;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -10,7 +10,7 @@ public record LoanOfferGeneratedEvent(
         UUID applicationId,
         String cif,
         BigDecimal amount,
-        int periodMonths,
+        Integer periodMonths,
         BigDecimal interestRate,
         BigDecimal monthlyInstallment,
         Instant createdAt

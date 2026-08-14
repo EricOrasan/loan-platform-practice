@@ -24,11 +24,12 @@ public class KafkaLoanOfferEventPublisher implements LoanOfferEventPublisher {
     }
 
     @Override
-    public void publishGenerated(LoanOffer loanOffer) {
+    public void publishGenerated(LoanOffer loanOffer, String cif) {
         LoanOfferGeneratedEvent event = new LoanOfferGeneratedEvent(
                 UUID.randomUUID(),
                 "LOAN_OFFER_GENERATED",
                 loanOffer.getApplicationId(),
+                cif,
                 loanOffer.getAmount(),
                 loanOffer.getPeriodMonths(),
                 loanOffer.getInterestRate(),

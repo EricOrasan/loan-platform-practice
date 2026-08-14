@@ -40,6 +40,6 @@ public class GenerateLoanOfferService implements GenerateLoanOfferUseCase {
 
         LoanOffer savedLoanOffer = repository.save(loanOffer);
 
-        eventPublisher.publishGenerated(savedLoanOffer);
+        eventPublisher.publishGenerated(savedLoanOffer, command.cif());
     }
 }

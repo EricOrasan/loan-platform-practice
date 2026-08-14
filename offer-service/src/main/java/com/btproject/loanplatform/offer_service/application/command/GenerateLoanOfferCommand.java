@@ -10,6 +10,7 @@ import java.util.UUID;
 public record GenerateLoanOfferCommand(
         UUID eventId,
         UUID applicationId,
+        String cif,
         BigDecimal requestedAmount,
         int requestedPeriodMonths,
         int score,
@@ -22,6 +23,10 @@ public record GenerateLoanOfferCommand(
         Objects.requireNonNull(requestedAmount, "requestedAmount must not be null");
         Objects.requireNonNull(decision, "decision must not be null");
         Objects.requireNonNull(assessmentCreatedAt, "assessmentCreatedAt must not be null");
+
+        if (cif == null || !cif.matches("[0-9]{8}")) {
+            throw new IllegalArgumentException("cif must contain exactly 8 digits");
+        }
 
         if (requestedAmount.signum() <= 0) {
             throw new IllegalArgumentException("requestedAmount must be greater than 0");

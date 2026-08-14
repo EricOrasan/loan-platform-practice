@@ -1,0 +1,73 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-notification
+      author: eric
+
+      changes:
+        - createTable:
+            tableName: notification
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_notification
+
+              - column:
+                  name: application_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: channel
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: recipient
+                  type: VARCHAR(320)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: message
+                  type: VARCHAR(1000)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: notification
+            columnNames: application_id
+            constraintName: uk_notification_application_id
+
+        - sql:
+            dbms: postgresql
+            splitStatements: true
+            sql: |
+              ALTER TABLE notification
+                  ADD CONSTRAINT ck_notification_channel
+                  CHECK (channel IN ('EMAIL', 'SMS'));
+
+              ALTER TABLE notification
+                  ADD CONSTRAINT ck_notification_status
+                  CHECK (status IN ('CREATED', 'SENT', 'FAILED'));
+
+      rollback:
+        - dropTable:
+            tableName: notification

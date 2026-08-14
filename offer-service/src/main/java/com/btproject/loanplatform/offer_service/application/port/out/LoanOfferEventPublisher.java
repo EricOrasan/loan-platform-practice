@@ -4,5 +4,5 @@ import com.btproject.loanplatform.offer_service.domain.LoanOffer;
 
 public interface LoanOfferEventPublisher {
 
-    void publishGenerated(LoanOffer loanOffer);
+    void publishGenerated(LoanOffer loanOffer, String cif);
 }

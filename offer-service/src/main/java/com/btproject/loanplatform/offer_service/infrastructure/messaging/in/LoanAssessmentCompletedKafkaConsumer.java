@@ -47,6 +47,7 @@ public class LoanAssessmentCompletedKafkaConsumer {
             return new GenerateLoanOfferCommand(
                     event.eventId(),
                     event.applicationId(),
+                    event.cif(),
                     event.requestedAmount(),
                     event.requestedPeriodMonths(),
                     event.score(),
