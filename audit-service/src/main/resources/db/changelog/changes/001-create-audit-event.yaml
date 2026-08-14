@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-audit-event
+      author: eric
+
+      changes:
+        - createTable:
+            tableName: audit_event
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_audit_event
+
+              - column:
+                  name: event_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: event_type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: aggregate_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: payload
+                  type: TEXT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: audit_event
+            columnNames: event_id
+            constraintName: uk_audit_event_event_id
+
+        - createIndex:
+            tableName: audit_event
+            indexName: idx_audit_event_aggregate_created_at
+            columns:
+              - column:
+                  name: aggregate_id
+              - column:
+                  name: created_at
+
+        - sql:
+            dbms: postgresql
+            sql: |
+              ALTER TABLE audit_event
+                  ADD CONSTRAINT ck_audit_event_type
+                  CHECK (event_type IN (
+                      'LOAN_APPLICATION_CREATED',
+                      'LOAN_ASSESSMENT_COMPLETED',
+                      'LOAN_OFFER_GENERATED'
+                  ));
+
+      rollback:
+        - dropTable:
+            tableName: audit_event

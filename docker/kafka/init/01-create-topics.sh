@@ -33,5 +33,6 @@ create_topic "loan.offer.generated" 3 1
 create_topic "loan.application.created.dlq" 3 1
 create_topic "loan.assessment.completed.dlq" 3 1
 create_topic "loan.offer.generated.dlq" 3 1
+create_topic "audit.events.dlq" 3 1
 
 echo "Kafka topics are ready."
