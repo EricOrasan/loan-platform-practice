@@ -5,5 +5,6 @@ import com.btproject.loanplatform.credit_assessment_service.domain.CustomerFinan
 import java.util.Optional;
 
 public interface CustomerInformationPort {
+
     Optional<CustomerFinancialProfile> findByCif(String cif);
 }

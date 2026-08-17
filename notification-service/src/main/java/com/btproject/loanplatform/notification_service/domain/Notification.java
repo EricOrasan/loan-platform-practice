@@ -14,15 +14,7 @@ public final class Notification {
     private NotificationStatus status;
     private final Instant createdAt;
 
-    private Notification(
-            UUID id,
-            UUID applicationId,
-            NotificationChannel channel,
-            String recipient,
-            String message,
-            NotificationStatus status,
-            Instant createdAt
-    ) {
+    private Notification(UUID id, UUID applicationId, NotificationChannel channel, String recipient, String message, NotificationStatus status, Instant createdAt) {
         this.id = Objects.requireNonNull(id, "id must not be null");
         this.applicationId = Objects.requireNonNull(applicationId, "applicationId must not be null");
         this.channel = Objects.requireNonNull(channel, "channel must not be null");
@@ -35,35 +27,11 @@ public final class Notification {
     public static Notification create(UUID applicationId, NotificationChannel channel, String recipient) {
         String message = "Your loan offer was generated successfully for application " + applicationId + ".";
 
-        return new Notification(
-                UUID.randomUUID(),
-                applicationId,
-                channel,
-                recipient,
-                message,
-                NotificationStatus.CREATED,
-                Instant.now()
-        );
+        return new Notification(UUID.randomUUID(), applicationId, channel, recipient, message, NotificationStatus.CREATED, Instant.now());
     }
 
-    public static Notification restore(
-            UUID id,
-            UUID applicationId,
-            NotificationChannel channel,
-            String recipient,
-            String message,
-            NotificationStatus status,
-            Instant createdAt
-    ) {
-        return new Notification(
-                id,
-                applicationId,
-                channel,
-                recipient,
-                message,
-                status,
-                createdAt
-        );
+    public static Notification restore(UUID id, UUID applicationId, NotificationChannel channel, String recipient, String message, NotificationStatus status, Instant createdAt) {
+        return new Notification(id, applicationId, channel, recipient, message, status, createdAt);
     }
 
     public void markAsSent() {

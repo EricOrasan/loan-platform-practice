@@ -19,8 +19,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Component
-public class RestSecurityErrorHandler
-        implements AuthenticationEntryPoint, AccessDeniedHandler {
+public class RestSecurityErrorHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
@@ -29,8 +28,7 @@ public class RestSecurityErrorHandler
     }
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception
-    ) throws IOException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         response.setHeader(
                 HttpHeaders.WWW_AUTHENTICATE,
                 "Basic realm=\"customer-service\""
@@ -46,8 +44,7 @@ public class RestSecurityErrorHandler
     }
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception
-    ) throws IOException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) throws IOException {
         writeErrorResponse(
                 response,
                 HttpStatus.FORBIDDEN,

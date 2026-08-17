@@ -5,6 +5,7 @@ import com.btproject.loanplatform.credit_assessment_service.domain.CreditAssessm
 import java.util.UUID;
 
 public interface CreditAssessmentRepository {
+
     boolean existsByApplicationId(UUID applicationId);
     CreditAssessment save(CreditAssessment assessment);
 }

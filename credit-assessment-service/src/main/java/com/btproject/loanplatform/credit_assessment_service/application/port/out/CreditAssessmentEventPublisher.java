@@ -6,9 +6,5 @@ import java.math.BigDecimal;
 
 public interface CreditAssessmentEventPublisher {
 
-    void publishCompleted(
-            CreditAssessment assessment,
-            BigDecimal requestedAmount,
-            int requestedPeriodMonths
-    );
+    void publishCompleted(CreditAssessment assessment, BigDecimal requestedAmount, int requestedPeriodMonths);
 }

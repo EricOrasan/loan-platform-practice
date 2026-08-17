@@ -107,9 +107,7 @@ public class CustomerServiceHttpAdapter implements CustomerInformationPort {
         }
     }
 
-    private CustomerFinancialProfile toFinancialProfile(
-            CustomerServiceResponse response
-    ) {
+    private CustomerFinancialProfile toFinancialProfile(CustomerServiceResponse response) {
         if (response == null) {
             throw new CustomerInformationUnavailableException("Customer Service returned an empty response", new IllegalStateException("Response body was null")
             );
@@ -133,11 +131,7 @@ public class CustomerServiceHttpAdapter implements CustomerInformationPort {
         };
     }
 
-    private void retryOrThrow(
-            int attempt,
-            String reason,
-            Exception exception
-    ) {
+    private void retryOrThrow(int attempt, String reason, Exception exception) {
         if (attempt >= maxAttempts) {
             throw new CustomerInformationUnavailableException(
                     "Customer Service request failed after "

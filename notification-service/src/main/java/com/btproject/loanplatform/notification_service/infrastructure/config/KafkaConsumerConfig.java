@@ -23,11 +23,7 @@ public class KafkaConsumerConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerConfig.class);
 
     @Bean
-    public CommonErrorHandler kafkaErrorHandler(
-            KafkaTemplate<?, ?> kafkaTemplate,
-            @Value("${app.kafka.topics.loan-offer-generated-dlq}")
-            String dlqTopic
-    ) {
+    public CommonErrorHandler kafkaErrorHandler(KafkaTemplate<?, ?> kafkaTemplate, @Value("${app.kafka.topics.loan-offer-generated-dlq}") String dlqTopic) {
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
                 kafkaTemplate,
                 (record, exception) -> new TopicPartition(dlqTopic, record.partition())
@@ -47,11 +43,7 @@ public class KafkaConsumerConfig {
         errorHandler.setRetryListeners(new RetryListener() {
 
             @Override
-            public void failedDelivery(
-                    ConsumerRecord<?, ?> record,
-                    Exception exception,
-                    int deliveryAttempt
-            ) {
+            public void failedDelivery(ConsumerRecord<?, ?> record, Exception exception, int deliveryAttempt) {
                 LOGGER.warn(
                         "Kafka message processing failed: topic={}, partition={}, offset={}, attempt={}, error={}",
                         record.topic(),
@@ -74,11 +66,7 @@ public class KafkaConsumerConfig {
             }
 
             @Override
-            public void recoveryFailed(
-                    ConsumerRecord<?, ?> record,
-                    Exception originalException,
-                    Exception recoveryException
-            ) {
+            public void recoveryFailed(ConsumerRecord<?, ?> record, Exception originalException, Exception recoveryException) {
                 LOGGER.error(
                         "Failed to send Kafka message to DLQ: topic={}, partition={}, offset={}",
                         record.topic(),

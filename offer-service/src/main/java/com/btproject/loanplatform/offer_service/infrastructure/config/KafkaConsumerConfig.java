@@ -21,11 +21,7 @@ public class KafkaConsumerConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerConfig.class);
 
     @Bean
-    public CommonErrorHandler kafkaErrorHandler(
-            KafkaTemplate<?, ?> kafkaTemplate,
-            @Value("${app.kafka.topics.loan-assessment-completed-dlq}")
-            String dlqTopic
-    ) {
+    public CommonErrorHandler kafkaErrorHandler(KafkaTemplate<?, ?> kafkaTemplate, @Value("${app.kafka.topics.loan-assessment-completed-dlq}") String dlqTopic) {
         DeadLetterPublishingRecoverer recoverer =
                 new DeadLetterPublishingRecoverer(
                         kafkaTemplate,
@@ -44,11 +40,7 @@ public class KafkaConsumerConfig {
         errorHandler.setRetryListeners(new RetryListener() {
 
             @Override
-            public void failedDelivery(
-                    ConsumerRecord<?, ?> record,
-                    Exception exception,
-                    int deliveryAttempt
-            ) {
+            public void failedDelivery(ConsumerRecord<?, ?> record, Exception exception, int deliveryAttempt) {
                 LOGGER.warn(
                         "Kafka message processing failed: "
                                 + "topic={}, partition={}, offset={}, "
@@ -62,10 +54,7 @@ public class KafkaConsumerConfig {
             }
 
             @Override
-            public void recovered(
-                    ConsumerRecord<?, ?> record,
-                    Exception exception
-            ) {
+            public void recovered(ConsumerRecord<?, ?> record, Exception exception) {
                 LOGGER.warn(
                         "Kafka message sent to DLQ: "
                                 + "originalTopic={}, partition={}, "
@@ -78,11 +67,7 @@ public class KafkaConsumerConfig {
             }
 
             @Override
-            public void recoveryFailed(
-                    ConsumerRecord<?, ?> record,
-                    Exception originalException,
-                    Exception recoveryException
-            ) {
+            public void recoveryFailed(ConsumerRecord<?, ?> record, Exception originalException, Exception recoveryException) {
                 LOGGER.error(
                         "Failed to send Kafka message to DLQ: "
                                 + "topic={}, partition={}, offset={}",

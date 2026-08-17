@@ -22,9 +22,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(
-            PasswordEncoder passwordEncoder
-    ) {
+    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails user = User.builder()
                 .username("user")
                 .password(passwordEncoder.encode("user123"))
@@ -41,10 +39,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            RestSecurityErrorHandler securityErrorHandler
-    ) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, RestSecurityErrorHandler securityErrorHandler) throws Exception {
+
         return http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
