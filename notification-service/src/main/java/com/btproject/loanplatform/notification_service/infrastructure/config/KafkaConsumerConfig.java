@@ -24,6 +24,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public CommonErrorHandler kafkaErrorHandler(KafkaTemplate<?, ?> kafkaTemplate, @Value("${app.kafka.topics.loan-offer-generated-dlq}") String dlqTopic) {
+
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
                 kafkaTemplate,
                 (record, exception) -> new TopicPartition(dlqTopic, record.partition())
@@ -34,6 +35,7 @@ public class KafkaConsumerConfig {
                 recoverer,
                 new FixedBackOff(1_000L, 2L)
         );
+
         errorHandler.addNotRetryableExceptions(
                 InvalidEventPayloadException.class,
                 CustomerContactNotFoundException.class,

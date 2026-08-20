@@ -1,0 +1,291 @@
+openapi: 3.1.0
+info:
+  title: Loan Application Service API
+  version: 1.0.0
+  description: Creates and manages loan applications and publishes newly created applications for asynchronous processing.
+servers:
+  - url: /
+    description: Current Loan Application Service host
+tags:
+  - name: Loan Applications
+    description: Loan application lifecycle operations.
+paths:
+  /applications:
+    post:
+      tags: [Loan Applications]
+      summary: Create a loan application
+      operationId: createLoanApplication
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLoanApplicationRequest'
+      responses:
+        '201':
+          description: Loan application created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanApplicationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /applications/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ApplicationId'
+    get:
+      tags: [Loan Applications]
+      summary: Get a loan application
+      operationId: getLoanApplication
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Loan application found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanApplicationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    put:
+      tags: [Loan Applications]
+      summary: Update a loan application
+      operationId: updateLoanApplication
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLoanApplicationRequest'
+      responses:
+        '200':
+          description: Loan application updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanApplicationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    delete:
+      tags: [Loan Applications]
+      summary: Delete a loan application
+      description: Marks an eligible application as deleted. Requires the ADMIN role.
+      operationId: deleteLoanApplication
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: Loan application deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  parameters:
+    ApplicationId:
+      name: id
+      in: path
+      required: true
+      description: Loan application identifier.
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    CreateLoanApplicationRequest:
+      type: object
+      additionalProperties: false
+      required: [cif, requestedAmount, requestedPeriodMonths, purpose]
+      properties:
+        cif:
+          type: string
+          pattern: '^[0-9]{8}$'
+          example: '12345678'
+        requestedAmount:
+          type: number
+          format: double
+          exclusiveMinimum: 0
+          multipleOf: 0.01
+          example: 42000.00
+        requestedPeriodMonths:
+          type: integer
+          minimum: 6
+          maximum: 120
+          example: 60
+        purpose:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Home renovation
+    UpdateLoanApplicationRequest:
+      type: object
+      additionalProperties: false
+      required: [requestedAmount, requestedPeriodMonths, purpose]
+      properties:
+        requestedAmount:
+          type: number
+          format: double
+          exclusiveMinimum: 0
+          multipleOf: 0.01
+          example: 45000.00
+        requestedPeriodMonths:
+          type: integer
+          minimum: 6
+          maximum: 120
+          example: 60
+        purpose:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Home renovation and furnishing
+    LoanApplicationResponse:
+      type: object
+      required: [id, applicationNumber, cif, requestedAmount, requestedPeriodMonths, purpose, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        applicationNumber:
+          type: string
+          example: LA-D05484BD-4257-4EE7-93FC-3E0213ED60A9
+        cif:
+          type: string
+          pattern: '^[0-9]{8}$'
+        requestedAmount:
+          type: number
+          format: double
+        requestedPeriodMonths:
+          type: integer
+        purpose:
+          type: string
+        status:
+          $ref: '#/components/schemas/LoanApplicationStatus'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    LoanApplicationStatus:
+      type: string
+      enum: [DRAFT, SUBMITTED, ASSESSMENT_IN_PROGRESS, APPROVED, REJECTED, OFFER_GENERATED, DELETED]
+    ApiErrorResponse:
+      type: object
+      required: [code, message, details, correlationId, timestamp]
+      properties:
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Request validation failed
+        details:
+          type: string
+          example: Requested Period must be between 6 and 120 months.
+        correlationId:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    Unauthorized:
+      description: Missing or invalid authentication credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    Forbidden:
+      description: Authenticated caller does not have the required role
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    NotFound:
+      description: Loan application not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    Conflict:
+      description: Operation is not valid for the current application status
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    UnsupportedMediaType:
+      description: Content-Type is not application/json
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    InternalServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    ServiceUnavailable:
+      description: Database or messaging infrastructure temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'

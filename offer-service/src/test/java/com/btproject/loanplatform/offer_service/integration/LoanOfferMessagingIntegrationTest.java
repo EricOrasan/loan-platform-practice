@@ -137,8 +137,7 @@ class LoanOfferMessagingIntegrationTest {
             dlqConsumer.subscribe(List.of(dlqTopic));
             publishRaw(messageKey.toString(), invalidPayload);
 
-            ConsumerRecord<String, String> dlqRecord =
-                    awaitRecord(dlqConsumer, messageKey.toString(), Duration.ofSeconds(10));
+            ConsumerRecord<String, String> dlqRecord = awaitRecord(dlqConsumer, messageKey.toString(), Duration.ofSeconds(10));
 
             assertNotNull(dlqRecord);
             assertEquals(objectMapper.readTree(invalidPayload), objectMapper.readTree(dlqRecord.value()));
@@ -154,8 +153,7 @@ class LoanOfferMessagingIntegrationTest {
             dlqConsumer.subscribe(List.of(dlqTopic));
             publish(assessmentEvent(applicationId, UUID.randomUUID(), "APPROVED", 69));
 
-            ConsumerRecord<String, String> dlqRecord =
-                    awaitRecord(dlqConsumer, applicationId.toString(), Duration.ofSeconds(10));
+            ConsumerRecord<String, String> dlqRecord = awaitRecord(dlqConsumer, applicationId.toString(), Duration.ofSeconds(10));
 
             assertNotNull(dlqRecord);
             assertEquals(0, repository.count());
@@ -229,21 +227,13 @@ class LoanOfferMessagingIntegrationTest {
                 .orElse(null);
     }
 
-    private LoanOfferGeneratedEvent readOfferEvent(
-            KafkaConsumer<String, String> consumer,
-            UUID applicationId
-    ) throws Exception {
-        ConsumerRecord<String, String> record =
-                awaitRecord(consumer, applicationId.toString(), Duration.ofSeconds(10));
+    private LoanOfferGeneratedEvent readOfferEvent(KafkaConsumer<String, String> consumer, UUID applicationId) throws Exception {
+        ConsumerRecord<String, String> record = awaitRecord(consumer, applicationId.toString(), Duration.ofSeconds(10));
         assertNotNull(record, "No offer event received for applicationId=" + applicationId);
         return objectMapper.readValue(record.value(), LoanOfferGeneratedEvent.class);
     }
 
-    private ConsumerRecord<String, String> awaitRecord(
-            KafkaConsumer<String, String> consumer,
-            String key,
-            Duration timeout
-    ) {
+    private ConsumerRecord<String, String> awaitRecord(KafkaConsumer<String, String> consumer, String key, Duration timeout) {
         Instant deadline = Instant.now().plus(timeout);
 
         while (Instant.now().isBefore(deadline)) {
@@ -258,12 +248,7 @@ class LoanOfferMessagingIntegrationTest {
         return null;
     }
 
-    private static LoanAssessmentCompletedEvent assessmentEvent(
-            UUID applicationId,
-            UUID eventId,
-            String decision,
-            int score
-    ) {
+    private static LoanAssessmentCompletedEvent assessmentEvent(UUID applicationId, UUID eventId, String decision, int score) {
         return new LoanAssessmentCompletedEvent(
                 eventId,
                 "LOAN_ASSESSMENT_COMPLETED",

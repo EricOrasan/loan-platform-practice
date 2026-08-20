@@ -8,10 +8,7 @@ import java.math.BigDecimal;
 public record CreateCustomerRequest(
 
         @NotBlank(message = "CIF is required")
-        @Pattern(
-                regexp = "^[0-9]{8}$",
-                message = "CIF must contain exactly 8 digits"
-        )
+        @Pattern(regexp = "^[0-9]{8}$", message = "CIF must contain exactly 8 digits")
         String cif,
 
         @NotBlank(message = "First Name is required")
@@ -29,11 +26,7 @@ public record CreateCustomerRequest(
 
         @NotNull(message = "Monthly income is required")
         @Positive(message = "Monthly income must be greater than zero")
-        @Digits(
-                integer = 13,
-                fraction = 2,
-                message = "Monthly income must have at most 13 integer digits and 2 decimal places"
-        )
+        @Digits(integer = 13, fraction = 2, message = "Monthly income must have at most 13 integer digits and 2 decimal places")
         BigDecimal monthlyIncome,
 
         @NotNull(message = "Risk Category is required")

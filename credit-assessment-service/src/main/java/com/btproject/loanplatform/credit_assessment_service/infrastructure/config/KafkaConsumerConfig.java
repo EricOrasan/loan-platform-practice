@@ -3,6 +3,7 @@ package com.btproject.loanplatform.credit_assessment_service.infrastructure.conf
 import com.btproject.loanplatform.credit_assessment_service.infrastructure.messaging.in.exception.InvalidEventPayloadException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,10 +40,9 @@ public class KafkaConsumerConfig {
         errorHandler.setRetryListeners(new RetryListener() {
 
             @Override
-            public void failedDelivery(ConsumerRecord<?, ?> record, Exception exception, int deliveryAttempt) {
+            public void failedDelivery(@NonNull ConsumerRecord<?, ?> record, Exception exception, int deliveryAttempt) {
                 log.warn(
-                        "Kafka message processing failed: " +
-                                "topic={}, partition={}, offset={}, attempt={}, error={}",
+                        "Kafka message processing failed: topic={}, partition={}, offset={}, attempt={}, error={}",
                         record.topic(),
                         record.partition(),
                         record.offset(),
@@ -52,10 +52,9 @@ public class KafkaConsumerConfig {
             }
 
             @Override
-            public void recovered(ConsumerRecord<?, ?> record, Exception exception) {
+            public void recovered(@NonNull ConsumerRecord<?, ?> record, Exception exception) {
                 log.warn(
-                        "Kafka message sent to DLQ: " +
-                                "originalTopic={}, partition={}, offset={}, error={}",
+                        "Kafka message sent to DLQ: originalTopic={}, partition={}, offset={}, error={}",
                         record.topic(),
                         record.partition(),
                         record.offset(),
@@ -64,10 +63,9 @@ public class KafkaConsumerConfig {
             }
 
             @Override
-            public void recoveryFailed(ConsumerRecord<?, ?> record, Exception originalException, Exception recoveryException) {
+            public void recoveryFailed(@NonNull ConsumerRecord<?, ?> record, Exception originalException, @NonNull Exception recoveryException) {
                 log.error(
-                        "Failed to send Kafka message to DLQ: " +
-                                "topic={}, partition={}, offset={}",
+                        "Failed to send Kafka message to DLQ: topic={}, partition={}, offset={}",
                         record.topic(),
                         record.partition(),
                         record.offset(),

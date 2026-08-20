@@ -74,6 +74,27 @@ class LoanApplicationControllerIntegrationTest {
     }
 
     @Test
+    void shouldExposeContractFirstOpenApiDocumentWithoutAuthentication() {
+        ResponseEntity<String> response = restTemplate.getForEntity(
+                "/openapi/loan-application-service.yaml",
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().contains("title: Loan Application Service API"));
+        assertTrue(response.getBody().contains("/applications:"));
+
+        ResponseEntity<String> swaggerUi = restTemplate.getForEntity(
+                "/swagger-ui/index.html",
+                String.class
+        );
+        assertEquals(HttpStatus.OK, swaggerUi.getStatusCode());
+        assertNotNull(swaggerUi.getBody());
+        assertTrue(swaggerUi.getBody().contains("Swagger UI"));
+    }
+
+    @Test
     void shouldCreatePersistAndPublishLoanApplication() throws Exception {
         try (KafkaConsumer<String, String> consumer = createKafkaConsumer()) {
             consumer.subscribe(List.of(applicationCreatedTopic));

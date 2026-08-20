@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
 
     // 404 Not Found
     @ExceptionHandler(LoanApplicationNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleLoanApplicationNotFoundException(LoanApplicationNotFoundException exception){
+    public ResponseEntity<ApiErrorResponse> handleLoanApplicationNotFoundException(LoanApplicationNotFoundException exception) {
         ApiErrorResponse response = new ApiErrorResponse(
                 "APPLICATION_NOT_FOUND",
                 "Loan Application was not found",
@@ -80,9 +80,7 @@ public class GlobalExceptionHandler {
 
     // 400 Bad Request
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiErrorResponse> handleInvalidApplicationId(
-            MethodArgumentTypeMismatchException exception) {
-
+    public ResponseEntity<ApiErrorResponse> handleInvalidApplicationId(MethodArgumentTypeMismatchException exception) {
         ApiErrorResponse response = new ApiErrorResponse(
                 "INVALID_APPLICATION_ID",
                 "Invalid application ID",
@@ -187,7 +185,7 @@ public class GlobalExceptionHandler {
 
     // 409 Invalid Status
     @ExceptionHandler(InvalidLoanApplicationStatusException.class)
-    public ResponseEntity<ApiErrorResponse> handleInvalidLoanApplicationStatusException(InvalidLoanApplicationStatusException exception){
+    public ResponseEntity<ApiErrorResponse> handleInvalidLoanApplicationStatusException(InvalidLoanApplicationStatusException exception) {
         ApiErrorResponse response = new ApiErrorResponse(
                 "APPLICATION_INVALID_STATUS",
                 "Loan application operation is not allowed in the current status",
@@ -266,7 +264,7 @@ public class GlobalExceptionHandler {
 
     // 500 Internal Server Error
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleException(Exception exception){
+    public ResponseEntity<ApiErrorResponse> handleException(Exception exception) {
         UUID correlationId = UUID.randomUUID();
 
         LOGGER.error(

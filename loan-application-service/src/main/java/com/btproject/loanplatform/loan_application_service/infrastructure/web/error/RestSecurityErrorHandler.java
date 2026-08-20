@@ -2,6 +2,7 @@ package com.btproject.loanplatform.loan_application_service.infrastructure.web.e
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,7 +28,7 @@ public class RestSecurityErrorHandler implements AuthenticationEntryPoint, Acces
     }
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
+    public void commence(@NonNull HttpServletRequest request, HttpServletResponse response, @NonNull AuthenticationException exception) throws IOException {
         response.setHeader(
                 HttpHeaders.WWW_AUTHENTICATE,
                 "Basic realm=\"loan-application-service\""
@@ -43,7 +44,7 @@ public class RestSecurityErrorHandler implements AuthenticationEntryPoint, Acces
     }
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) throws IOException {
+    public void handle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull AccessDeniedException exception) throws IOException {
         writeErrorResponse(
                 response,
                 HttpStatus.FORBIDDEN,

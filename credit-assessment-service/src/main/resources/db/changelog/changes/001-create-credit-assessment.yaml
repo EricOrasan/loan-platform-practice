@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 001-create-credit-assessment
-      author: codex
+      author: eric
       changes:
         - createTable:
             tableName: credit_assessment

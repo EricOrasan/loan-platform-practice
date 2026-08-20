@@ -101,7 +101,7 @@ public final class LoanApplication {
     }
 
     private static int verifyRequestedPeriodMonths(int requestedPeriodMonths) {
-        if  (requestedPeriodMonths < 6 || requestedPeriodMonths > 120) {
+        if (requestedPeriodMonths < 6 || requestedPeriodMonths > 120) {
             throw new IllegalArgumentException("Requested period must be between 6 and 120 months");
         }
         return requestedPeriodMonths;

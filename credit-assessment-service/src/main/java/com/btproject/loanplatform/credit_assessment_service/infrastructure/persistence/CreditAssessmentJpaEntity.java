@@ -39,6 +39,6 @@ public class CreditAssessmentJpaEntity {
     @Column(nullable = false)
     private AssessmentReason reason;
 
-    @Column(name = "created_at",  nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 }

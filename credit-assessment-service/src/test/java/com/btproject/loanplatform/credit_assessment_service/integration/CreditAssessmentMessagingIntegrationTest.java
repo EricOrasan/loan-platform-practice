@@ -202,8 +202,7 @@ class CreditAssessmentMessagingIntegrationTest {
             awaitAssessment(applicationId);
             readAssessmentEvent(outputConsumer, applicationId);
 
-            ConsumerRecord<String, String> duplicateFailure =
-                    awaitRecord(dlqConsumer, applicationId.toString(), Duration.ofSeconds(2));
+            ConsumerRecord<String, String> duplicateFailure = awaitRecord(dlqConsumer, applicationId.toString(), Duration.ofSeconds(2));
 
             assertNull(duplicateFailure);
             assertEquals(1, repository.count());
@@ -253,12 +252,8 @@ class CreditAssessmentMessagingIntegrationTest {
         throw new AssertionError("No assessment persisted for applicationId=" + applicationId);
     }
 
-    private LoanAssessmentCompletedEvent readAssessmentEvent(
-            KafkaConsumer<String, String> consumer,
-            UUID applicationId
-    ) throws Exception {
-        ConsumerRecord<String, String> record =
-                awaitRecord(consumer, applicationId.toString(), Duration.ofSeconds(10));
+    private LoanAssessmentCompletedEvent readAssessmentEvent(KafkaConsumer<String, String> consumer, UUID applicationId) throws Exception {
+        ConsumerRecord<String, String> record = awaitRecord(consumer, applicationId.toString(), Duration.ofSeconds(10));
         assertNotNull(record, "No assessment event received for applicationId=" + applicationId);
         return objectMapper.readValue(record.value(), LoanAssessmentCompletedEvent.class);
     }

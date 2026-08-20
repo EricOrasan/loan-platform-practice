@@ -7,6 +7,5 @@ import java.util.UUID;
 public interface NotificationRepository {
 
     boolean existsByApplicationId(UUID applicationId);
-
     Notification save(Notification notification);
 }

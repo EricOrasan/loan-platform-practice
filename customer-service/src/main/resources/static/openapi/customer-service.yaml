@@ -1,0 +1,242 @@
+openapi: 3.1.0
+info:
+  title: Customer Service API
+  version: 1.0.0
+  description: Manages customer identity and financial profile data used by the loan platform.
+servers:
+  - url: /
+    description: Current Customer Service host
+tags:
+  - name: Customers
+    description: Customer identity and financial profile operations.
+paths:
+  /customers:
+    post:
+      tags: [Customers]
+      summary: Create a customer
+      operationId: createCustomer
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+      responses:
+        '201':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /customers/{cif}:
+    parameters:
+      - $ref: '#/components/parameters/Cif'
+    get:
+      tags: [Customers]
+      summary: Get a customer by CIF
+      operationId: getCustomerByCif
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    delete:
+      tags: [Customers]
+      summary: Delete a customer by CIF
+      operationId: deleteCustomerByCif
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: Customer deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  parameters:
+    Cif:
+      name: cif
+      in: path
+      required: true
+      description: Customer identification number containing exactly eight digits.
+      schema:
+        type: string
+        pattern: '^[0-9]{8}$'
+        example: '12345678'
+  schemas:
+    CreateCustomerRequest:
+      type: object
+      additionalProperties: false
+      required: [cif, firstName, lastName, email, monthlyIncome, riskCategory]
+      properties:
+        cif:
+          type: string
+          pattern: '^[0-9]{8}$'
+          example: '12345678'
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Andrei
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Popescu
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: andrei.popescu@example.com
+        monthlyIncome:
+          type: number
+          format: double
+          exclusiveMinimum: 0
+          multipleOf: 0.01
+          example: 8500.00
+        riskCategory:
+          $ref: '#/components/schemas/RiskCategory'
+    CustomerResponse:
+      type: object
+      required: [id, cif, firstName, lastName, email, monthlyIncome, riskCategory, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        cif:
+          type: string
+          pattern: '^[0-9]{8}$'
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        monthlyIncome:
+          type: number
+          format: double
+        riskCategory:
+          $ref: '#/components/schemas/RiskCategory'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    RiskCategory:
+      type: string
+      enum: [LOW, MEDIUM, HIGH]
+    ApiErrorResponse:
+      type: object
+      required: [code, message, details, correlationId, timestamp]
+      properties:
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Request validation failed
+        details:
+          type: string
+          example: CIF must contain exactly 8 digits
+        correlationId:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    Unauthorized:
+      description: Missing or invalid authentication credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    Forbidden:
+      description: Authenticated caller does not have the required role
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    NotFound:
+      description: Customer not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    Conflict:
+      description: Customer CIF or email already exists
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    UnsupportedMediaType:
+      description: Content-Type is not application/json
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    InternalServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    ServiceUnavailable:
+      description: Database temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'

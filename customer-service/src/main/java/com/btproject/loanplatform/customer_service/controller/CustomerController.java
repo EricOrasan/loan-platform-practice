@@ -26,27 +26,13 @@ public class CustomerController {
     }
 
     @GetMapping("/{cif}")
-    public CustomerResponse getCustomer(
-            @PathVariable
-            @Pattern(
-                    regexp = "^[0-9]{8}$",
-                    message = "CIF must contain exactly 8 digits"
-            )
-            String cif
-    ) {
+    public CustomerResponse getCustomer(@PathVariable @Pattern(regexp = "^[0-9]{8}$", message = "CIF must contain exactly 8 digits") String cif) {
         return customerService.getCustomerByCif(cif);
     }
 
     @DeleteMapping("/{cif}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCustomer(
-            @PathVariable
-            @Pattern(
-                    regexp = "^[0-9]{8}$",
-                    message = "CIF must contain exactly 8 digits"
-            )
-            String cif
-    ) {
+    public void deleteCustomer(@PathVariable @Pattern(regexp = "^[0-9]{8}$", message = "CIF must contain exactly 8 digits") String cif) {
         customerService.deleteCustomerByCif(cif);
     }
 

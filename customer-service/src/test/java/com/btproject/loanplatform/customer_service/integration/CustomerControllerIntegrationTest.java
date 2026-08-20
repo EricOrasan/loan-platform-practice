@@ -50,6 +50,27 @@ class CustomerControllerIntegrationTest {
     }
 
     @Test
+    void shouldExposeContractFirstOpenApiDocumentWithoutAuthentication() {
+        ResponseEntity<String> response = restTemplate.getForEntity(
+                "/openapi/customer-service.yaml",
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().contains("title: Customer Service API"));
+        assertTrue(response.getBody().contains("/customers:"));
+
+        ResponseEntity<String> swaggerUi = restTemplate.getForEntity(
+                "/swagger-ui/index.html",
+                String.class
+        );
+        assertEquals(HttpStatus.OK, swaggerUi.getStatusCode());
+        assertNotNull(swaggerUi.getBody());
+        assertTrue(swaggerUi.getBody().contains("Swagger UI"));
+    }
+
+    @Test
     void shouldCreateAndPersistCustomerAsAdmin() {
         CreateCustomerRequest request = validRequest("ANDREI.POPESCU@EXAMPLE.COM");
 

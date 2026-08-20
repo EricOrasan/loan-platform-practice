@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface LoanApplicationRepository {
+
     LoanApplication save(LoanApplication loanApplication);
     Optional<LoanApplication> findById(UUID id);
 }

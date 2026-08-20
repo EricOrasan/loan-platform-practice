@@ -12,11 +12,7 @@ public record CreateLoanApplicationRequest(
 
         @NotNull(message = "Requested Amount is required")
         @DecimalMin(message = "Requested Amount must be greater than 0", value = "0", inclusive = false)
-        @Digits(
-                integer = 13,
-                fraction = 2,
-                message = "Requested Amount must have at most 13 integer digits and 2 decimal places"
-        )
+        @Digits(integer = 13, fraction = 2, message = "Requested Amount must have at most 13 integer digits and 2 decimal places")
         BigDecimal requestedAmount,
 
         @NotNull(message = "Requested Period is required")

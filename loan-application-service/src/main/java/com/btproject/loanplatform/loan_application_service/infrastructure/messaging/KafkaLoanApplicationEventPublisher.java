@@ -34,6 +34,7 @@ public class KafkaLoanApplicationEventPublisher implements LoanApplicationEventP
 
     @Override
     public void publishCreated(LoanApplication loanApplication) {
+
         LoanApplicationCreatedEvent createdEvent = new LoanApplicationCreatedEvent(
                 UUID.randomUUID(),
                 "LOAN_APPLICATION_CREATED",
@@ -59,16 +60,10 @@ public class KafkaLoanApplicationEventPublisher implements LoanApplicationEventP
             throw new IllegalStateException("Unexpected event publishing error", cause);
         } catch (RuntimeException exception) {
             if (isTemporaryFailure(exception)) {
-                throw new EventPublishingUnavailableException(
-                        "Kafka is temporarily unavailable",
-                        exception
-                );
+                throw new EventPublishingUnavailableException("Kafka is temporarily unavailable", exception);
             }
 
-            throw new IllegalStateException(
-                    "Unexpected event publishing error",
-                    exception
-            );
+            throw new IllegalStateException("Unexpected event publishing error", exception);
         }
     }
 
@@ -76,8 +71,7 @@ public class KafkaLoanApplicationEventPublisher implements LoanApplicationEventP
         Throwable current = throwable;
 
         while (current != null) {
-            if (current instanceof RetriableException
-                    || current instanceof TimeoutException) {
+            if (current instanceof RetriableException || current instanceof TimeoutException) {
                 return true;
             }
 

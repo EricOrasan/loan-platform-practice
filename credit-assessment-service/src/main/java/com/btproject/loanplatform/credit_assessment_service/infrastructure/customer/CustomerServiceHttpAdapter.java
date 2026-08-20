@@ -48,9 +48,7 @@ public class CustomerServiceHttpAdapter implements CustomerInformationPort {
 
         this.restClient = builder
                 .baseUrl(baseUrl)
-                .defaultHeaders(headers ->
-                        headers.setBasicAuth(username, password)
-                )
+                .defaultHeaders(headers -> headers.setBasicAuth(username, password))
                 .build();
 
         this.maxAttempts = maxAttempts;
@@ -84,20 +82,12 @@ public class CustomerServiceHttpAdapter implements CustomerInformationPort {
                     throw new CustomerInformationUnavailableException("Customer Service request failed with status " + status, exception);
                 }
 
-                retryOrThrow(
-                        attempt,
-                        "HTTP status " + status,
-                        exception
-                );
+                retryOrThrow(attempt, "HTTP status " + status, exception);
 
                 attempt++;
 
             } catch (ResourceAccessException exception) {
-                retryOrThrow(
-                        attempt,
-                        "connection or timeout failure",
-                        exception
-                );
+                retryOrThrow(attempt, "connection or timeout failure", exception);
 
                 attempt++;
 
@@ -109,8 +99,7 @@ public class CustomerServiceHttpAdapter implements CustomerInformationPort {
 
     private CustomerFinancialProfile toFinancialProfile(CustomerServiceResponse response) {
         if (response == null) {
-            throw new CustomerInformationUnavailableException("Customer Service returned an empty response", new IllegalStateException("Response body was null")
-            );
+            throw new CustomerInformationUnavailableException("Customer Service returned an empty response", new IllegalStateException("Response body was null"));
         }
 
         try {
@@ -133,18 +122,11 @@ public class CustomerServiceHttpAdapter implements CustomerInformationPort {
 
     private void retryOrThrow(int attempt, String reason, Exception exception) {
         if (attempt >= maxAttempts) {
-            throw new CustomerInformationUnavailableException(
-                    "Customer Service request failed after "
-                            + maxAttempts
-                            + " attempts: "
-                            + reason,
-                    exception
-            );
+            throw new CustomerInformationUnavailableException("Customer Service request failed after " + maxAttempts + " attempts: " + reason, exception);
         }
 
         LOGGER.warn(
-                "Customer Service request failed: {}. "
-                        + "Retrying attempt {}/{} after {} ms",
+                "Customer Service request failed: {}. Retrying attempt {}/{} after {} ms",
                 reason,
                 attempt + 1,
                 maxAttempts,
